@@ -36,54 +36,12 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:1999
       KAFKA_BROKER_ID: 1
       KAFKA_BROKER_RACK: "r1"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_JMX_PORT: 9991
-      KAFKA_HEAP_OPTS: -Xmx512M -Xms512M
-    logging:
-      options:
-        max-size: "512k"
-        max-file: "10"
-  kafka2:
-    image: confluentinc/cp-kafka:7.2.2
-    depends_on:
-      - zookeeper
-    ports:
-      - "2999:2999"
-    environment:
-      <<: *kafkaConfig
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092,PLAINTEXT_HOST://localhost:2999
-      KAFKA_BROKER_ID: 2
-    logging:
-      options:
-        max-size: "512k"
-        max-file: "10"
-  kafka3:
-    image: confluentinc/cp-kafka:7.2.2
-    depends_on:
-      - zookeeper
-    ports:
-      - "3999:3999"
-    environment:
-      <<: *kafkaConfig
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092,PLAINTEXT_HOST://localhost:3999
-      KAFKA_BROKER_ID: 3
-    logging:
-      options:
-        max-size: "512k"
-        max-file: "10"
-  kafdrop:
-    image: obsidiandynamics/kafdrop:latest
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    ports:
-      - "19000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: kafka1:9092;kafka2:9092;kafka3:9092
+      KAFKA_HEAP_OPTS: -Xmx512M
     logging:
       options:
         max-size: "512k"
@@ -94,6 +52,7 @@ services:
       dockerfile: LiveRouteApiDockerfile
     ports:
       - "8080:8080"
+      - "80:8080"
     environment:
       ENV_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092,kafka3:9092"
   route-points-generator:

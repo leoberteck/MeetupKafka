@@ -37,8 +37,6 @@ public class App implements CommandLineRunner {
 
     @Value("${app.config.routesPath}")
     private String routesPath;
-    @Value("${app.config.numberOfVehicles}")
-    private Integer numberOfVehicles;
     @Value("${app.config.pointGenerationIntervalMs}")
     private Integer pointGenerationIntervalMs;
     @Value("${app.kafka.bootstrapServers}")

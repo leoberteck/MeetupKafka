@@ -9,6 +9,6 @@ FROM openjdk:17
 COPY --from=build /workspace/app/RoutePointsGenerator/target/RoutePointsGenerator.jar app.jar
 
 ENV ENV_GEN_INTERVAL=2000
-ENV ENV_BOOTSTRAP_SERVERS="localhost:1999,localhost:2999,localhost:3999"
+ENV ENV_BOOTSTRAP_SERVERS="localhost:1999"
 
 ENTRYPOINT java -jar app.jar

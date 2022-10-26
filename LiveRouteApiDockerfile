@@ -8,6 +8,6 @@ RUN mvn clean install package -DskipTests
 FROM openjdk:17
 COPY --from=build /workspace/app/LiveRouteApi/target/LiveRouteApi.jar app.jar
 
-ENV ENV_BOOTSTRAP_SERVERS="localhost:1999,localhost:2999,localhost:3999"
+ENV ENV_BOOTSTRAP_SERVERS="localhost:1999"
 
 ENTRYPOINT java -jar app.jar
