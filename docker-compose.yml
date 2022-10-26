@@ -1,0 +1,107 @@
+version: '3.3'
+
+services:
+  #  Zookeepers
+  zookeeper:
+    image: zookeeper:3.8.0
+    restart: always
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      JVMFLAGS: -Xmx256m
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+      ZOO_4LW_COMMANDS_WHITELIST: "*"
+    healthcheck:
+      test: [ "CMD-SHELL", "echo ruok | nc -w 2 zookeeper 2181" ]
+      interval: 5s
+      timeout: 3s
+      retries: 2
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "10"
+  #kafka broker
+  kafka1:
+    image: confluentinc/cp-kafka:7.2.2
+    depends_on:
+      - zookeeper
+    ports:
+      - "1999:1999"
+    environment: &kafkaConfig
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:1999
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: "r1"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_JMX_PORT: 9991
+      KAFKA_HEAP_OPTS: -Xmx512M -Xms512M
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "10"
+  kafka2:
+    image: confluentinc/cp-kafka:7.2.2
+    depends_on:
+      - zookeeper
+    ports:
+      - "2999:2999"
+    environment:
+      <<: *kafkaConfig
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092,PLAINTEXT_HOST://localhost:2999
+      KAFKA_BROKER_ID: 2
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "10"
+  kafka3:
+    image: confluentinc/cp-kafka:7.2.2
+    depends_on:
+      - zookeeper
+    ports:
+      - "3999:3999"
+    environment:
+      <<: *kafkaConfig
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092,PLAINTEXT_HOST://localhost:3999
+      KAFKA_BROKER_ID: 3
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "10"
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    ports:
+      - "19000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka1:9092;kafka2:9092;kafka3:9092
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "10"
+  live-route-api:
+    build:
+      context: .
+      dockerfile: LiveRouteApiDockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ENV_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092,kafka3:9092"
+  route-points-generator:
+    restart: always
+    depends_on:
+      - live-route-api
+    build:
+      context: .
+      dockerfile: RoutePointGeneratorDockerfile
+    environment:
+      ENV_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092,kafka3:9092"

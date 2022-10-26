@@ -1,0 +1,15 @@
+app:
+  config:
+    routesPath: "classpath:routes.json"
+    numberOfVehicles: 2
+    pointGenerationIntervalMs: ${ENV_GEN_INTERVAL:2000}
+  kafka:
+    bootstrapServers: ${ENV_BOOTSTRAP_SERVERS:localhost:1999,localhost:2999,localhost:3999}
+    outputTopic:
+      name: "route_points_live"
+      partitions: 1
+      replication: 3
+      properties:
+        retentionMs: "259200000"
+        retentionBytes: "107374182"
+        cleanupPolicy: "delete"

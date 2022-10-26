@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Meetup Kafka</title>
+    <script src='https://unpkg.com/can-ndjson-stream@0.1/dist/global/can-ndjson-stream.js'></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
+</head>
+<body>
+    <div id="map" style="width: 100%; position: absolute; top: 0px; bottom: 0px; left: -10px; margin: 10px; outline: none;"></div>
+<script>
+var map = L.map('map').setView([-21.2068073, -50.4322834], 14);
+
+var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+const streamerr = e => {
+  console.warn("Stream error");
+  console.warn(e);
+}
+
+var carIcon = L.icon({
+    iconUrl: 'car_icon.png',
+    iconSize: [40, 23]
+});
+
+var markerMap = {}
+
+var updateMarkerPosition = async (r) => {
+    var status = r.route_status
+    if(status === 'ROUTE_START' || status === 'ROUTE_INPROGRESS'){
+        if(!markerMap.hasOwnProperty(r.route_name)){
+            markerMap[r.route_name] = L.marker(r.current_point.reverse(), { icon: carIcon }).addTo(map)
+        } else {
+            markerMap[r.route_name].setLatLng(r.current_point.reverse())
+        }
+    } else if(status === 'ROUTE_FINISH' && markerMap.hasOwnProperty(r.route_name)) {
+        //if route finished and marker exists. Remove marker from map
+        markerMap[r.route_name].removeFrom(map)
+        delete markerMap[r.route_name]
+    }
+}
+
+fetch("/routes/stream/points").then((response) => {
+  return can.ndjsonStream(response.body);
+}).then(todosStream => {
+  var reader = todosStream.getReader();
+  reader.read().then(read = async result => {
+    if (result.done) {
+      console.log("Done.");
+      return;
+    }
+    var r = JSON.parse(result.value)
+    console.log(result.value);
+    await updateMarkerPosition(r)
+
+    reader.read().then(read, streamerr);
+  }, streamerr);
+});
+
+</script>
+</body>
+</html>
