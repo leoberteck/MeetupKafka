@@ -3,8 +3,8 @@ version: '3.3'
 services:
   #  Zookeepers
   zookeeper:
-    image: zookeeper:3.8.0
     restart: always
+    image: zookeeper:3.8.0
     hostname: zookeeper
     ports:
       - "2181:2181"
@@ -21,9 +21,10 @@ services:
     logging:
       options:
         max-size: "512k"
-        max-file: "10"
+        max-file: "5"
   #kafka broker
   kafka1:
+    restart: always
     image: confluentinc/cp-kafka:7.2.2
     depends_on:
       - zookeeper
@@ -45,8 +46,9 @@ services:
     logging:
       options:
         max-size: "512k"
-        max-file: "10"
+        max-file: "5"
   live-route-api:
+    restart: always
     build:
       context: .
       dockerfile: LiveRouteApiDockerfile
@@ -55,6 +57,10 @@ services:
       - "80:8080"
     environment:
       ENV_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092,kafka3:9092"
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "5"
   route-points-generator:
     restart: always
     depends_on:
@@ -64,3 +70,7 @@ services:
       dockerfile: RoutePointGeneratorDockerfile
     environment:
       ENV_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092,kafka3:9092"
+    logging:
+      options:
+        max-size: "512k"
+        max-file: "5"
