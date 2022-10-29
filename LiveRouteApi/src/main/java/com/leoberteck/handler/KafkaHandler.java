@@ -32,7 +32,7 @@ public class KafkaHandler {
         routePointsStream = kafkaReceiver.receive()
             .publish()
             .autoConnect(1)
-            .onBackpressureBuffer(100, BufferOverflowStrategy.DROP_OLDEST)
+            .onBackpressureBuffer(1, BufferOverflowStrategy.DROP_OLDEST)
             .map(ConsumerRecord::value);
     }
 

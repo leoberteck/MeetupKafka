@@ -9,7 +9,6 @@ services:
     ports:
       - "2181:2181"
     environment:
-      JVMFLAGS: -Xmx256m
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181
       ZOO_4LW_COMMANDS_WHITELIST: "*"
@@ -22,6 +21,11 @@ services:
       options:
         max-size: "512k"
         max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 200M
   #kafka broker
   kafka1:
     restart: always
@@ -42,11 +46,15 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_JMX_PORT: 9991
-      KAFKA_HEAP_OPTS: -Xmx512M
     logging:
       options:
         max-size: "512k"
         max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 200M
   live-route-api:
     restart: always
     build:
@@ -61,6 +69,11 @@ services:
       options:
         max-size: "512k"
         max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 200M
   route-points-generator:
     restart: always
     depends_on:
@@ -74,3 +87,8 @@ services:
       options:
         max-size: "512k"
         max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 200M
