@@ -45,6 +45,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_HEAP_OPTS: -Xmx200M -Xms100M
       KAFKA_JMX_PORT: 9991
     logging:
       options:
@@ -54,7 +55,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 150M
+          memory: 200M
   live-route-api:
     restart: always
     build:
