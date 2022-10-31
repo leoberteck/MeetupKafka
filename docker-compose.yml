@@ -25,7 +25,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 100M
+          memory: 256M
   #kafka broker
   kafka1:
     restart: always
@@ -45,7 +45,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
-      KAFKA_HEAP_OPTS: -Xmx200M -Xms100M
+      KAFKA_HEAP_OPTS: -Xmx500M -Xms100M
       KAFKA_JMX_PORT: 9991
     logging:
       options:
@@ -55,7 +55,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 200M
+          memory: 512M
   live-route-api:
     restart: always
     build:
@@ -74,7 +74,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 150M
+          memory: 200M
   route-points-generator:
     restart: always
     depends_on:
@@ -92,4 +92,4 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 150M
+          memory: 200M
