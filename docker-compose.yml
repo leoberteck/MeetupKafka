@@ -24,8 +24,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 200M
+          cpus: '0.5'
+          memory: 100M
   #kafka broker
   kafka1:
     restart: always
@@ -53,8 +53,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 200M
+          cpus: '0.5'
+          memory: 150M
   live-route-api:
     restart: always
     build:
@@ -72,8 +72,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 200M
+          cpus: '0.5'
+          memory: 150M
   route-points-generator:
     restart: always
     depends_on:
@@ -90,5 +90,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 200M
+          cpus: '0.5'
+          memory: 150M
